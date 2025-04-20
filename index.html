@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盆栽ハッシュジェネレーター</title>
+    <style>
+        body {
+            font-family: 'Meiryo', 'Hiragino Kaku Gothic Pro', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #4a6741;
+            color: white;
+            border-radius: 5px;
+        }
+        .translator {
+            display: flex;
+            gap: 20px;
+            height: 70vh;
+        }
+        .panel {
+            flex: 1;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-header {
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+            border-radius: 5px 5px 0 0;
+        }
+        .panel-content {
+            flex: 1;
+            padding: 15px;
+            overflow: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            font-family: 'Meiryo', 'Hiragino Kaku Gothic Pro', sans-serif;
+        }
+        textarea:focus {
+            outline: none;
+        }
+        pre {
+            white-space: pre-wrap;
+            margin: 0;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+        .bonsai-container {
+            background-color: #fff;
+            padding: 20px;
+            height: 100%;
+            overflow: auto;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4a6741;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-button:hover {
+            background-color: #3a5331;
+        }
+        .right-panel {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>盆栽ハッシュジェネレーター</h1>
+            <p>テキストを入力すると、そのハッシュ値に基づいた盆栽のASCIIアートを生成します</p>
+        </header>
+
+        <div class="translator">
+            <div class="panel">
+                <div class="panel-header">入力テキスト</div>
+                <div class="panel-content">
+                    <textarea id="input-text" placeholder="ここにテキストを入力してください..."></textarea>
+                </div>
+            </div>
+            <div class="panel right-panel">
+                <div class="panel-header">盆栽 ASCII アート</div>
+                <button id="copy-button" class="copy-button">コピー</button>
+                <div class="panel-content">
+                    <div class="bonsai-container">
+                        <pre id="output-bonsai"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 盆栽ハッシュジェネレーター | GitHub Pages</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('input-text');
+            const outputBonsai = document.getElementById('output-bonsai');
+            const copyButton = document.getElementById('copy-button');
+
+            // 初期盆栽表示
+            generateDefaultBonsai();
+
+            // テキスト入力イベント
+            inputText.addEventListener('input', function() {
+                const text = inputText.value.trim();
+                if (text === '') {
+                    generateDefaultBonsai();
+                } else {
+                    const hash = generateHash(text);
+                    const bonsai = generateBonsai(hash);
+                    outputBonsai.textContent = bonsai;
+                }
+            });
+
+            // コピーボタンの処理
+            copyButton.addEventListener('click', function() {
+                const bonsaiText = outputBonsai.textContent;
+                navigator.clipboard.writeText(bonsaiText).then(function() {
+                    const originalText = copyButton.textContent;
+                    copyButton.textContent = 'コピー完了！';
+                    setTimeout(function() {
+                        copyButton.textContent = originalText;
+                    }, 2000);
+                });
+            });
+
+            // シンプルなハッシュ関数
+            function generateHash(str) {
+                let hash = 0;
+                if (str.length === 0) return hash;
+                
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // 32bit整数に変換
+                }
+                
+                return Math.abs(hash);
+            }
+
+            // 初期盆栽を表示
+            function generateDefaultBonsai() {
+                const defaultBonsai = `
+    何かテキストを入力すると
+    盆栽が生成されます...
+
+         _i_
+        /   \\
+       /     \\
+      /       \\
+     /_________\\
+        |   |
+        |___|
+`;
+                outputBonsai.textContent = defaultBonsai;
+            }
+
+            // ハッシュ値から盆栽を生成する関数
+            function generateBonsai(hash) {
+                // ハッシュの各部分を取り出して盆栽の特徴を決定
+                const treeSize = (hash % 3) + 1; // 1, 2, 3のサイズ
+                const potStyle = (hash % 5) + 1; // 5種類の鉢
+                const trunkStyle = (hash % 4) + 1; // 4種類の幹
+                const foliageType = (hash % 6) + 1; // 6種類の葉
+                const extraFeature = (hash % 10) + 1; // 追加の特徴（石、苔など）
+                
+                // 盆栽を組み立てる
+                let bonsai = '';
+                
+                // 葉/冠部分
+                bonsai += generateFoliage(foliageType, treeSize);
+                
+                // 幹部分
+                bonsai += generateTrunk(trunkStyle, treeSize);
+                
+                // 鉢部分
+                bonsai += generatePot(potStyle);
+                
+                // 追加要素
+                if (extraFeature > 7) {
+                    bonsai += addExtraFeature(extraFeature);
+                }
+                
+                return bonsai;
+            }
+
+            // 葉/冠を生成
+            function generateFoliage(type, size) {
+                let foliage = '';
+                const width = size * 4 + 3;
+                
+                switch(type) {
+                    case 1: // 丸い形
+                        foliage = roundFoliage(size);
+                        break;
+                    case 2: // 三角形
+                        foliage = triangularFoliage(size);
+                        break;
+                    case 3: // 不規則形
+                        foliage = irregularFoliage(size);
+                        break;
+                    case 4: // 雲形
+                        foliage = cloudFoliage(size);
+                        break;
+                    case 5: // 扇形
+                        foliage = fanFoliage(size);
+                        break;
+                    case 6: // まばら
+                        foliage = sparseFoliage(size);
+                        break;
+                }
+                
+                return foliage;
+            }
+            
+            function roundFoliage(size) {
+                let result = '';
+                const chars = ['*', '@', 'o', '&', '#'];
+                const char = chars[Math.floor(size * 7) % chars.length];
+                
+                if (size === 1) {
+                    result += `    ${char}${char}${char}    \n`;
+                    result += `   ${char}${char}${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += `   ${char}${char}${char}${char}${char}   \n`;
+                    result += `    ${char}${char}${char}    \n`;
+                } else if (size === 2) {
+                    result += `     ${char}${char}${char}${char}${char}     \n`;
+                    result += `   ${char}${char}${char}${char}${char}${char}${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += `   ${char}${char}${char}${char}${char}${char}${char}${char}${char}   \n`;
+                    result += `     ${char}${char}${char}${char}${char}     \n`;
+                } else {
+                    result += `      ${char}${char}${char}${char}${char}${char}      \n`;
+                    result += `    ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}    \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}\n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += `    ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}    \n`;
+                    result += `      ${char}${char}${char}${char}${char}${char}      \n`;
+                }
+                
+                return result;
+            }
+            
+            function triangularFoliage(size) {
+                let result = '';
+                const chars = ['^', 'A', '▲', '△', '∆'];
+                const char = chars[Math.floor(size * 9) % chars.length];
+                
+                if (size === 1) {
+                    result += `     ${char}     \n`;
+                    result += `    ${char}${char}${char}    \n`;
+                    result += `   ${char}${char}${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}  \n`;
+                } else if (size === 2) {
+                    result += `      ${char}      \n`;
+                    result += `     ${char}${char}${char}     \n`;
+                    result += `    ${char}${char}${char}${char}${char}    \n`;
+                    result += `   ${char}${char}${char}${char}${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                } else {
+                    result += `       ${char}       \n`;
+                    result += `      ${char}${char}${char}      \n`;
+                    result += `     ${char}${char}${char}${char}${char}     \n`;
+                    result += `    ${char}${char}${char}${char}${char}${char}${char}    \n`;
+                    result += `   ${char}${char}${char}${char}${char}${char}${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}\n`;
+                }
+                
+                return result;
+            }
+            
+            function irregularFoliage(size) {
+                let result = '';
+                const chars = ['%', '#', '&', '@', '*'];
+                const char = chars[Math.floor(size * 11) % chars.length];
+                
+                if (size === 1) {
+                    result += `   ${char}${char}  ${char}   \n`;
+                    result += `  ${char}${char}${char}${char} ${char}${char}  \n`;
+                    result += ` ${char}${char} ${char}${char}${char}${char}${char} \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}  \n`;
+                } else if (size === 2) {
+                    result += `    ${char}${char}  ${char}${char}    \n`;
+                    result += `   ${char}${char}${char}${char} ${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char} ${char}${char}${char}${char}${char}${char} ${char} \n`;
+                    result += `${char}${char}${char}${char}${char} ${char}${char} ${char}${char}${char}${char}\n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                } else {
+                    result += `     ${char}${char}   ${char}${char}${char}    \n`;
+                    result += `   ${char}${char}${char}${char} ${char}${char} ${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char} ${char}${char}${char}${char}${char}${char}${char} ${char}${char} \n`;
+                    result += `${char}${char}${char}${char}${char} ${char}${char}${char} ${char}${char} ${char}${char}${char}${char}\n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `  ${char}${char}${char} ${char}${char}${char}${char} ${char}${char}${char}  \n`;
+                }
+                
+                return result;
+            }
+            
+            function cloudFoliage(size) {
+                let result = '';
+                const chars = ['~', '∿', '≈', '≋', '∽'];
+                const char = chars[Math.floor(size * 13) % chars.length];
+                
+                if (size === 1) {
+                    result += `  ${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `${char}${char}${char}${char}${char}${char}${char}${char}${char}\n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char} \n`;
+                } else if (size === 2) {
+                    result += `   ${char}${char}${char}${char}${char}${char}   \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}\n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                } else {
+                    result += `    ${char}${char}${char}${char}${char}${char}${char}${char}    \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}\n`;
+                    result += `${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}\n`;
+                    result += ` ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char} \n`;
+                    result += `  ${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}${char}  \n`;
+                }
+                
+                return result;
+            }
+            
+            function fanFoliage(size) {
+                let result = '';
+                const chars = ['V', 'Y', '⋎', '⋏', '⊻'];
+                const char = chars[Math.floor(size * 7) % chars.length];
+                
+                if (size === 1) {
+                    result += `  ${char} ${char} ${char}  \n`;
+                    result += ` ${char} ${char} ${char} ${char} \n`;
+                    result += `${char} ${char} ${char} ${char} ${char}\n`;
+                } else if (size === 2) {
+                    result += `   ${char}  ${char}  ${char}   \n`;
+                    result += `  ${char}  ${char}  ${char}  ${char}  \n`;
+                    result += ` ${char}  ${char}  ${char}  ${char}  ${char} \n`;
+                    result += `${char}  ${char}  ${char}  ${char}  ${char}  ${char}\n`;
+                    result += ` ${char}  ${char}  ${char}  ${char}  ${char} \n`;
+                } else {
+                    result += `    ${char}   ${char}   ${char}    \n`;
+                    result += `   ${char}   ${char}   ${char}   ${char}   \n`;
+                    result += `  ${char}   ${char}   ${char}   ${char}   ${char}  \n`;
+                    result += ` ${char}   ${char}   ${char}   ${char}   ${char}   ${char} \n`;
+                    result += `${char}   ${char}   ${char}   ${char}   ${char}   ${char}   ${char}\n`;
+                    result += ` ${char}   ${char}   ${char}   ${char}   ${char}   ${char} \n`;
+                    result += `  ${char}   ${char}   ${char}   ${char}   ${char}  \n`;
+                }
+                
+                return result;
+            }
+            
+            function sparseFoliage(size) {
+                let result = '';
+                const chars = ['.', ':', '·', '˙', '°'];
+                const char = chars[Math.floor(size * 5) % chars.length];
+                
+                if (size === 1) {
+                    result += ` ${char}  ${char}  ${char} \n`;
+                    result += `  ${char}   ${char}  \n`;
+                    result += ` ${char}  ${char} ${char}  \n`;
+                    result += `   ${char}    \n`;
+                } else if (size === 2) {
+                    result += `  ${char}   ${char}   ${char}  \n`;
+                    result += ` ${char}  ${char}  ${char}  ${char} \n`;
+                    result += `   ${char}   ${char}   \n`;
+                    result += `${char}  ${char}  ${char}  ${char}  ${char}\n`;
+                    result += ` ${char}   ${char}   ${char} \n`;
+                    result += `  ${char}  ${char}  ${char}  \n`;
+                } else {
+                    result += `   ${char}    ${char}    ${char}   \n`;
+                    result += `  ${char}   ${char}   ${char}   ${char}  \n`;
+                    result += ` ${char}   ${char}   ${char}   ${char}   ${char} \n`;
+                    result += `    ${char}    ${char}    \n`;
+                    result += ` ${char}   ${char}   ${char}   ${char}   ${char} \n`;
+                    result += `${char}   ${char}   ${char}   ${char}   ${char}   ${char}\n`;
+                    result += `   ${char}    ${char}    ${char}   \n`;
+                }
+                
+                return result;
+            }
+
+            // 幹の生成
+            function generateTrunk(type, size) {
+                let trunk = '';
+                const trunkHeight = size + 1;
+                
+                switch(type) {
+                    case 1: // 真っ直ぐ
+                        trunk = straightTrunk(trunkHeight);
+                        break;
+                    case 2: // 曲がった
+                        trunk = bentTrunk(trunkHeight);
+                        break;
+                    case 3: // 分岐
+                        trunk = branchedTrunk(trunkHeight);
+                        break;
+                    case 4: // ねじれ
+                        trunk = twistedTrunk(trunkHeight);
+                        break;
+                }
+                
+                return trunk;
+            }
+            
+            function straightTrunk(height) {
+                let result = '';
+                for (let i = 0; i < height; i++) {
+                    result += `       |       \n`;
+                }
+                return result;
+            }
+            
+            function bentTrunk(height) {
+                let result = '';
+                if (height === 1) {
+                    result += `       /       \n`;
+                } else if (height === 2) {
+                    result += `       /       \n`;
+                    result += `      /        \n`;
+                } else {
+                    result += `       /       \n`;
+                    result += `      /        \n`;
+                    result += `     /         \n`;
+                }
+                return result;
+            }
+            
+            function branchedTrunk(height) {
+                let result = '';
+                if (height === 1) {
+                    result += `      Y        \n`;
+                } else if (height === 2) {
+                    result += `      Y        \n`;
+                    result += `       |       \n`;
+                } else {
+                    result += `     Y Y       \n`;
+                    result += `      Y        \n`;
+                    result += `       |       \n`;
+                }
+                return result;
+            }
+            
+            function twistedTrunk(height) {
+                let result = '';
+                if (height === 1) {
+                    result += `       S       \n`;
+                } else if (height === 2) {
+                    result += `       S       \n`;
+                    result += `       S       \n`;
+                } else {
+                    result += `       S       \n`;
+                    result += `       S       \n`;
+                    result += `       S       \n`;
+                }
+                return result;
+            }
+
+            // 鉢の生成
+            function generatePot(type) {
+                let pot = '';
+                
+                switch(type) {
+                    case 1: // 四角い鉢
+                        pot = `    [_____]    \n`;
+                        break;
+                    case 2: // 丸い鉢
+                        pot = `     (___)     \n`;
+                        break;
+                    case 3: // 六角形の鉢
+                        pot = `    /_____\\    \n`;
+                        break;
+                    case 4: // 浅い鉢
+                        pot = `    \\_____/    \n`;
+                        break;
+                    case 5: // 特殊な形
+                        pot = `    {=====}    \n`;
+                        break;
+                }
+                
+                return pot;
+            }
+
+            // 追加要素
+            function addExtraFeature(type) {
+                let feature = '';
+                
+                switch(type) {
+                    case 8: // 苔
+                        feature = `    ,,,,,,,    \n`;
+                        break;
+                    case 9: // 石
+                        feature = `    .  o .    \n`;
+                        break;
+                    case 10: // ミニチュア
+                        feature = `      ^_^      \n`;
+                        break;
+                }
+                
+                return feature;
+            }
+        });
+    </script>
+</body>
+</html>
