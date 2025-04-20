@@ -199,86 +199,85 @@ function setDeltas(type, life, age, multiplier) {
     let dice;
 
     switch (type) {
-    case branchType.TRUNK: // trunk
-    // new or dead trunk
-    if (age <= 2 || life < 4) {
-    dy = 0;
-    dx = roll(3) - 1;
-}
-// young trunk should grow wide
-else if (age < (multiplier * 3)) {
-// every (multiplier * 0.8) steps, raise tree to next level
-if (age % Math.floor(multiplier * 0.5) === 0) dy = -1;
-else dy = 0;
+        case branchType.TRUNK: // trunk
+            // new or dead trunk
+            if (age <= 2 || life < 4) {
+                dy = 0;
+                dx = roll(3) - 1;
+            }
+            // young trunk should grow wide
+            else if (age < (multiplier * 3)) {
+                // every (multiplier * 0.8) steps, raise tree to next level
+                if (age % Math.floor(multiplier * 0.5) === 0) dy = -1;
+                else dy = 0;
+            
+                dice = roll(10);
+                if (dice >= 0 && dice <= 0) dx = -2;
+                else if (dice >= 1 && dice <= 3) dx = -1;
+                else if (dice >= 4 && dice <= 5) dx = 0;
+                else if (dice >= 6 && dice <= 8) dx = 1;
+                else if (dice >= 9 && dice <= 9) dx = 2;
+            }
+            // middle-aged trunk
+            else {
+                dice = roll(10);
+                if (dice > 2) dy = -1;
+                else dy = 0;
+                dx = roll(3) - 1;
+            }
+            break;
 
-dice = roll(10);
-if (dice >= 0 && dice <= 0) dx = -2;
-else if (dice >= 1 && dice <= 3) dx = -1;
-else if (dice >= 4 && dice <= 5) dx = 0;
-else if (dice >= 6 && dice <= 8) dx = 1;
-else if (dice >= 9 && dice <= 9) dx = 2;
-}
-// middle-aged trunk
-else {
-dice = roll(10);
-if (dice > 2) dy = -1;
-else dy = 0;
-dx = roll(3) - 1;
-}
-break;
+        case branchType.SHOOT_LEFT: // left shoot: trend left and little vertical movement
+            dice = roll(10);
+            if (dice >= 0 && dice <= 1) dy = -1;
+            else if (dice >= 2 && dice <= 7) dy = 0;
+            else if (dice >= 8 && dice <= 9) dy = 1;
+            
+            dice = roll(10);
+            if (dice >= 0 && dice <= 1) dx = -2;
+            else if (dice >= 2 && dice <= 5) dx = -1;
+            else if (dice >= 6 && dice <= 8) dx = 0;
+            else if (dice >= 9 && dice <= 9) dx = 1;
+            break;
 
-case branchType.SHOOT_LEFT: // left shoot: trend left and little vertical movement
-dice = roll(10);
-if (dice >= 0 && dice <= 1) dy = -1;
-else if (dice >= 2 && dice <= 7) dy = 0;
-else if (dice >= 8 && dice <= 9) dy = 1;
+        case branchType.SHOOT_RIGHT: // right shoot: trend right and little vertical movement
+            dice = roll(10);
+            if (dice >= 0 && dice <= 1) dy = -1;
+            else if (dice >= 2 && dice <= 7) dy = 0;
+            else if (dice >= 8 && dice <= 9) dy = 1;
+            
+            dice = roll(10);
+            if (dice >= 0 && dice <= 1) dx = 2;
+            else if (dice >= 2 && dice <= 5) dx = 1;
+            else if (dice >= 6 && dice <= 8) dx = 0;
+            else if (dice >= 9 && dice <= 9) dx = -1;
+            break;
+        case branchType.DYING: // dying: discourage vertical growth(?); trend left/right (-3,3)
+            dice = roll(10);
+            if (dice >= 0 && dice <= 1) dy = -1;
+            else if (dice >= 2 && dice <= 8) dy = 0;
+            else if (dice >= 9 && dice <= 9) dy = 1;
+            
+            dice = roll(15);
+            if (dice >= 0 && dice <= 0) dx = -3;
+            else if (dice >= 1 && dice <= 2) dx = -2;
+            else if (dice >= 3 && dice <= 5) dx = -1;
+            else if (dice >= 6 && dice <= 8) dx = 0;
+            else if (dice >= 9 && dice <= 11) dx = 1;
+            else if (dice >= 12 && dice <= 13) dx = 2;
+            else if (dice >= 14 && dice <= 14) dx = 3;
+            break;
+    
+        case branchType.DEAD: // dead: fill in surrounding area
+            dice = roll(10);
+            if (dice >= 0 && dice <= 2) dy = -1;
+            else if (dice >= 3 && dice <= 6) dy = 0;
+            else if (dice >= 7 && dice <= 9) dy = 1;
+            dx = roll(3) - 1;
+            break;
+    }
 
-dice = roll(10);
-if (dice >= 0 && dice <= 1) dx = -2;
-else if (dice >= 2 && dice <= 5) dx = -1;
-else if (dice >= 6 && dice <= 8) dx = 0;
-else if (dice >= 9 && dice <= 9) dx = 1;
-break;
-
-case branchType.SHOOT_RIGHT: // right shoot: trend right and little vertical movement
-dice = roll(10);
-if (dice >= 0 && dice <= 1) dy = -1;
-else if (dice >= 2 && dice <= 7) dy = 0;
-else if (dice >= 8 && dice <= 9) dy = 1;
-
-dice = roll(10);
-if (dice >= 0 && dice <= 1) dx = 2;
-else if (dice >= 2 && dice <= 5) dx = 1;
-else if (dice >= 6 && dice <= 8) dx = 0;
-else if (dice >= 9 && dice <= 9) dx = -1;
-break;
-
-case branchType.DYING: // dying: discourage vertical growth(?); trend left/right (-3,3)
-dice = roll(10);
-if (dice >= 0 && dice <= 1) dy = -1;
-else if (dice >= 2 && dice <= 8) dy = 0;
-else if (dice >= 9 && dice <= 9) dy = 1;
-
-dice = roll(15);
-if (dice >= 0 && dice <= 0) dx = -3;
-else if (dice >= 1 && dice <= 2) dx = -2;
-else if (dice >= 3 && dice <= 5) dx = -1;
-else if (dice >= 6 && dice <= 8) dx = 0;
-else if (dice >= 9 && dice <= 11) dx = 1;
-else if (dice >= 12 && dice <= 13) dx = 2;
-else if (dice >= 14 && dice <= 14) dx = 3;
-break;
-
-case branchType.DEAD: // dead: fill in surrounding area
-dice = roll(10);
-if (dice >= 0 && dice <= 2) dy = -1;
-else if (dice >= 3 && dice <= 6) dy = 0;
-else if (dice >= 7 && dice <= 9) dy = 1;
-dx = roll(3) - 1;
-break;
-}
-
-return { dx, dy };
+    return { dx, dy };
 }
 
 // Choose string for branch
