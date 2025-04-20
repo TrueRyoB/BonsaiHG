@@ -2,3 +2,6 @@
 This is a website that generates bonsai based on your input so that you will not be bored just typing out your creative ideas.<br>
 There is no usage restriction unlike other competitives like google translate and deepl translate.<br>
 Most of the code is generated and supported by Claude.<br>
+
+# Nomenclature
+HG stands for Hash Generator<br>
