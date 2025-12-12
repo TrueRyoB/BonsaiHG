@@ -52,6 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return '';
     }
 
+    function trimLine(s) {
+        const N = Math.min(10, s.length);
+        for(let i=0; i<N; ++i) if(s[i]==='\n') return s.substring(0, i);
+        return s.substring(0, N);
+    }
+
     function setPageTitle(text) {
         if(text.trim().length == 0) document.title = "盆栽HG";
         else document.title = text + ": 盆栽HG";
@@ -72,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (initialText) {
         inputText.value = initialText;
         generateBonsaiFromText(initialText);
-        setPageTitle(initialText.substring(0, 10));
+        setPageTitle(trimLine(initialText));
     } else {
         generateDefaultBonsai();
     }
@@ -105,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             generateBonsaiFromText(text);
             // URLにテキストを設定
             setTextToUrl(text);
-            setPageTitle(text.substring(0, 10));
+            setPageTitle(trimLine(text));
         }
     });
 
