@@ -16,6 +16,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    //Ctrl+S でtxtファイルを保存
+    window.addEventListener('keydown', function (e) {
+      const isSaveShortcut = (e.metaKey || e.ctrlKey) && (e.key === 'S' || e.key === 'S' || e.code === 'KeyS');
+      if(!isSaveShortcut) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      downloadContext();
+    }, {capture: true, passive: false});
+
+    function downloadContext() {
+        const content = inputText.value;
+        const filename = content.substring(0, 10) + ".txt";
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), content], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(()=> URL.revokeObjectURL(url), 5000);
+    }
+
     // URLからテキストを取得
     function getTextFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
