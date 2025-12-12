@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function downloadContext() {
         const content = inputText.value;
-        const filename = content.substring(0, 10) + ".txt";
+        const filename = content.trim().substring(0, 10) + " (盆栽HG).txt";
         const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), content], {type: 'text/plain'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
