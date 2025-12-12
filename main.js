@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    //TODO: webタイトル名変更
-
     //Ctrl+S でtxtファイルを保存
     window.addEventListener('keydown', function (e) {
       const isSaveShortcut = (e.metaKey || e.ctrlKey) && (e.key === 'S' || e.key === 'S' || e.code === 'KeyS');
@@ -54,6 +52,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return '';
     }
 
+    function setPageTitle(text) {
+        if(text.trim().length == 0) document.title = "盆栽HG";
+        else document.title = text + ": 盆栽HG";
+    }
+
     // URLにテキストを設定
     function setTextToUrl(text) {
         const url = new URL(window.location.href);
@@ -69,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (initialText) {
         inputText.value = initialText;
         generateBonsaiFromText(initialText);
+        setPageTitle(initialText.substring(0, 10));
     } else {
         generateDefaultBonsai();
     }
@@ -96,10 +100,12 @@ document.addEventListener('DOMContentLoaded', function() {
             generateDefaultBonsai();
             // URLからパラメータを削除
             window.history.replaceState({}, '', window.location.pathname);
+            setPageTitle("");
         } else {
             generateBonsaiFromText(text);
             // URLにテキストを設定
             setTextToUrl(text);
+            setPageTitle(text.substring(0, 10));
         }
     });
 
