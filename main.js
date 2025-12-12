@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    //TODO: webタイトル名変更
+
     //Ctrl+S でtxtファイルを保存
     window.addEventListener('keydown', function (e) {
       const isSaveShortcut = (e.metaKey || e.ctrlKey) && (e.key === 'S' || e.key === 'S' || e.code === 'KeyS');
@@ -71,8 +73,23 @@ document.addEventListener('DOMContentLoaded', function() {
         generateDefaultBonsai();
     }
 
+    //　タブ入力変換
+    inputText.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+
+            const tab = "  ";
+            this.value=this.value.slice(0, start) + tab + this.value.slice(end);
+            this.selectionStart = this.selectionEnd = start + tab.length;
+        }
+    });
+
     // テキスト入力イベント
     inputText.addEventListener('input', function() {
+
         const text = inputText.value.trim();
         isFormDirty = inputText.value.trim() !== '';
         if (text === '') {
